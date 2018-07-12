@@ -1,9 +1,7 @@
 const router = require('express').Router();
+const helper = require('./users-helpers/users-functions');
 
-router.get('/', (req, res) => {
-  res.json({
-    message: 'This is from the users route'
-  });
-});
+// REGISTER
+router.route('/register').post(helper.registerUser);
 
 module.exports = router;
