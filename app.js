@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const passport = require('passport');
 require('dotenv').config();
 require('./db/mongoose');
 
@@ -11,6 +12,11 @@ app.use(morgan('dev'));
 // Body parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// Passport middleware
+app.use(passport.initialize());
+// Passport config
+require('./config/passport')(passport);
 
 // Routes
 app.use('/', require('./routes/home'));
