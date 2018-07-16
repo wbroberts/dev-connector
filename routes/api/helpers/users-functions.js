@@ -1,18 +1,21 @@
 const gravatar = require('gravatar');
-const validator = require('validator');
 const jwt = require('jsonwebtoken');
 
 // User model
 const User = require('../../../models/User');
+// Validation
+const userRegistrationValidation = require('../../../validation/userRegistrationValidation');
+const loginValidation = require('../../../validation/loginValidation');
 
 // POST '/api/users/register'
 exports.registerUser = (req, res) => {
-  const { email, name, password, password2 } = req.body;
-
-  // Check if the email is valid
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ error: 'That is not a valid email' });
+  const { errors, isValid } = userRegistrationValidation(req.body);
+  // Check if there are any errors
+  if (!isValid) {
+    return res.status(400).json(errors);
   }
+
+  const { email, name, password, password2 } = req.body;
 
   User.findOne({ email })
     .then(user => {
@@ -20,13 +23,6 @@ exports.registerUser = (req, res) => {
       if (user) {
         return res.status(400).json({
           email: 'Email already exists'
-        });
-      }
-      // Make sure both password fields are the same
-      if (!validator.equals(password, password2)) {
-        // Send the error if they don't match
-        return res.status(400).json({
-          password: 'Passwords must match'
         });
       }
       // Find or create the generic avatar
@@ -42,7 +38,7 @@ exports.registerUser = (req, res) => {
         .save()
         .then(result => {
           res.json({
-            message: 'User successfully created',
+            message: 'Success',
             // Sends everything but the password
             user: {
               _id: result._id,
@@ -68,13 +64,13 @@ exports.registerUser = (req, res) => {
 
 // POST '/api/users/login'
 exports.login = (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-
-  // Validate email before checking credentials
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ email: 'Not a valid email' });
+  const { errors, isValid } = loginValidation(req.body);
+  // Check if there are any errors
+  if (!isValid) {
+    return res.status(400).json(errors);
   }
+
+  const { email, password } = req.body;
 
   // Check if the email is
   User.checkCredentials(email, password)
@@ -99,7 +95,12 @@ exports.login = (req, res) => {
       );
     })
     .catch(error => {
-      res.status(404).json({ error });
+      // Error is either email not found or incorrect password
+      error === 'email'
+        ? (errors.email = 'User not found')
+        : (errors.password = 'Password incorrect');
+
+      res.status(404).json(errors);
     });
 };
 

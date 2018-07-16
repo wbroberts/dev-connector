@@ -52,7 +52,7 @@ userSchema.statics.checkCredentials = function(email, password) {
   return this.findOne({ email }).then(user => {
     // See if a user is NOT found a return an error
     if (!user) {
-      return Promise.reject('Email is incorrect');
+      return Promise.reject('email');
     }
 
     // Check password
@@ -60,7 +60,7 @@ userSchema.statics.checkCredentials = function(email, password) {
       // Does password match the hashed password
       return bcrypt.compare(password, user.password, (error, result) => {
         if (!result) {
-          return reject('Password is incorrect');
+          return reject('password');
         } else {
           return resolve(user);
         }
