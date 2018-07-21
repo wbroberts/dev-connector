@@ -2,7 +2,7 @@ const validator = require('validator');
 
 const isEmpty = require('./isEmpty');
 
-// This is for the client side validation.
+// This is for the client side validation for loggin in.
 // There is backup validation in the User Schema
 userRegistrationValidation = obj => {
   const errors = {};

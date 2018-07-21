@@ -1,3 +1,4 @@
+// Returns true if the provided param is "empty"
 const isEmpty = value => {
   return (
     value === undefined ||

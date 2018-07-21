@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Create Schema
+// User Schema that provides a backup validation.
+// Created own validation for better client-side validation.
 const userSchema = mongoose.Schema({
   name: {
     type: String,
@@ -47,17 +48,16 @@ userSchema.pre('save', function(next) {
   }
 });
 
-// Check login credentials
+// Check login credentials -- email and password
 userSchema.statics.checkCredentials = function(email, password) {
   return this.findOne({ email }).then(user => {
-    // See if a user is NOT found a return an error
+    // See if a user is NOT found and return an error
     if (!user) {
       return Promise.reject('email');
     }
 
     // Check password
     return new Promise((resolve, reject) => {
-      // Does password match the hashed password
       return bcrypt.compare(password, user.password, (error, result) => {
         if (!result) {
           return reject('password');

@@ -31,7 +31,7 @@ userRegistrationValidation = obj => {
   if (validator.isEmpty(email)) {
     errors.email = 'Email is required';
   }
-  // Password Validation
+  // Password validation(s)
   if (!validator.isLength(password, { min: 6, max: 20 })) {
     errors.password = 'Password must be at least 6 characters';
   }
@@ -50,6 +50,7 @@ userRegistrationValidation = obj => {
 
   return {
     errors,
+    // If errors is empty, then isValid is true
     isValid: isEmpty(errors)
   };
 };

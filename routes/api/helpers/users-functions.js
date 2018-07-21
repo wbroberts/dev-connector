@@ -72,7 +72,7 @@ exports.login = (req, res) => {
 
   const { email, password } = req.body;
 
-  // Check if the email is
+  // Check if the email and password are valid and exist
   User.checkCredentials(email, password)
     .then(user => {
       // User info for payload
