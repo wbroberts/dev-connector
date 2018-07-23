@@ -8,7 +8,7 @@ const userRegistrationValidation = require('../../../validation/userRegistration
 const loginValidation = require('../../../validation/loginValidation');
 
 // POST '/api/users/register'
-exports.registerUser = (req, res) => {
+const registerUser = (req, res) => {
   const { errors, isValid } = userRegistrationValidation(req.body);
   // Check if there are any errors
   if (!isValid) {
@@ -63,7 +63,7 @@ exports.registerUser = (req, res) => {
 };
 
 // POST '/api/users/login'
-exports.login = (req, res) => {
+const login = (req, res) => {
   const { errors, isValid } = loginValidation(req.body);
   // Check if there are any errors
   if (!isValid) {
@@ -105,7 +105,7 @@ exports.login = (req, res) => {
 };
 
 // GET '/api/users/current'
-exports.authenticateUser = (req, res) => {
+const authenticateUser = (req, res) => {
   // Sends back the user object after it was authenticated
   res.json({
     id: req.user.id,
@@ -115,4 +115,8 @@ exports.authenticateUser = (req, res) => {
   });
 };
 
-module.exports = exports;
+module.exports = {
+  registerUser,
+  login,
+  authenticateUser
+};

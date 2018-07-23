@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-router.get('/', (req, res) => {
+router.get('/test', (req, res) => {
   res.json({
     message: 'This is the posts route'
   });

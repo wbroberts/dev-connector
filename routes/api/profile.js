@@ -4,7 +4,7 @@ const passport = require('passport');
 const {
   getUserProfile,
   createUserProfile
-} = require('./helpers/profile-functions');
+} = require('./helpers/profile-helpers');
 
 router.get('/test', (req, res) => {
   res.json({

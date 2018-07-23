@@ -5,7 +5,7 @@ const {
   registerUser,
   login,
   authenticateUser
-} = require('./helpers/users-functions');
+} = require('./helpers/users-helpers');
 
 // POST   '/api/users/register'
 // DESC   User registration path

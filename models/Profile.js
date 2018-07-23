@@ -8,8 +8,10 @@ const profileSchema = mongoose.Schema({
   handle: {
     type: String,
     required: true,
+    minlength: 2,
     maxlength: 40,
-    unique: true
+    unique: true,
+    trim: true
   },
   company: {
     type: String

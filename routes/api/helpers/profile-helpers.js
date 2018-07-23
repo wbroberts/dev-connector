@@ -2,8 +2,11 @@
 const Profile = require('../../../models/Profile');
 const User = require('../../../models/User');
 
+// Load functions
+const profileFields = require('./functions/profileFields');
+
 // GET '/api/profile'
-exports.getUserProfile = (req, res) => {
+const getUserProfile = (req, res) => {
   const errors = {};
 
   Profile.findOne({ user: req.user.id })
@@ -19,17 +22,11 @@ exports.getUserProfile = (req, res) => {
     });
 };
 
-// POST '/api/profile/'
-exports.createUserProfile = (req, res) => {
-  const profileFields = {};
+// POST '/api/profile'
+const createUserProfile = (req, res) => {
+  const profileData = profileFields(req.user, req.body);
 
-  profileFields.user = req.user.id;
-  profileFields.handle = req.body.handle;
-  profileFields.status = req.body.status;
-
-  if (req.body.skills) profileFields.skills = req.body.skills.split(',');
-
-  const newProfile = new Profile(profileFields);
+  const newProfile = new Profile(profileData);
 
   newProfile
     .save()
@@ -41,4 +38,7 @@ exports.createUserProfile = (req, res) => {
     });
 };
 
-module.exports = exports;
+module.exports = {
+  getUserProfile,
+  createUserProfile
+};
