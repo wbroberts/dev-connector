@@ -9,8 +9,7 @@ const profileFields = (reqUser, reqBody) => {
     status,
     skills,
     bio,
-    experience,
-    education,
+    githubusername,
     social
   } = reqBody;
 
@@ -27,9 +26,15 @@ const profileFields = (reqUser, reqBody) => {
   if (location) profile.location = location;
   if (skills) profile.skills = skills.split(',');
   if (bio) profile.bio = bio;
-  if (experience) profile.experience = experience;
-  if (education) profile.education = education;
-  if (social) profile.social = social;
+  if (githubusername) profile.githubusername = githubusername;
+
+  // Social media optional fields
+  profile.social = {};
+  if (social.youtube) profile.social.youtube = social.youtube;
+  if (social.twitter) profile.social.twitter = social.twitter;
+  if (social.facebook) profile.social.facebook = social.facebook;
+  if (social.linkedin) profile.social.linkedin = social.linkedin;
+  if (social.instagram) profile.social.instagram = social.instagram;
 
   return profile;
 };

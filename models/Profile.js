@@ -118,6 +118,21 @@ const profileSchema = mongoose.Schema({
   }
 });
 
+// This checks if that handle exists and returns an error if it does
+profileSchema.statics.checkIfHandleExists = function(handle) {
+  return this.findOne({ handle: handle })
+    .then(profile => {
+      if (profile) {
+        return Promise.reject('Handle already exists.');
+      }
+
+      return Promise.resolve();
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+};
+
 const Profile = mongoose.model('Profile', profileSchema);
 
 module.exports = Profile;
