@@ -125,11 +125,11 @@ profileSchema.statics.checkIfHandleExists = function(handle) {
       if (profile) {
         return Promise.reject('Handle already exists.');
       }
-
+      // If no profile with that handle, then continue
       return Promise.resolve();
     })
     .catch(error => {
-      return Promise.reject(error);
+      return error;
     });
 };
 

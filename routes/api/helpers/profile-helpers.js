@@ -34,22 +34,22 @@ const createUserProfile = (req, res) => {
           { user: req.user.id },
           { $set: profileData },
           { new: true }
-        ).then(updated => {
-          res.status(200).json({ updated });
+        ).then(updatedProfile => {
+          return res.status(200).json({ updatedProfile });
         });
-      } else {
-        // Check if handle exists (returns an error if it does)
-        Profile.checkIfHandleExists(profileData.handle)
-          .then(() => {
-            // Save the new profile if handle does not exist
-            newProfile.save().then(profile => {
-              res.status(201).json({ profile });
-            });
-          })
-          .catch(error => {
-            res.status(400).json({ error });
-          });
       }
+
+      // Check if handle exists (returns an error if it does)
+      Profile.checkIfHandleExists(profileData.handle)
+        .then(() => {
+          // Save the new profile if handle does not exist
+          newProfile.save().then(profile => {
+            res.status(201).json({ profile });
+          });
+        })
+        .catch(error => {
+          res.status(400).json({ error });
+        });
     })
     .catch(error => {
       res.status(400).json({ error });
