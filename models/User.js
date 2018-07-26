@@ -53,6 +53,7 @@ userSchema.statics.checkCredentials = function(email, password) {
   return this.findOne({ email }).then(user => {
     // See if a user is NOT found and return an error
     if (!user) {
+      // Sends 'email' back as error to add to errors object
       return Promise.reject('email');
     }
 
@@ -60,6 +61,7 @@ userSchema.statics.checkCredentials = function(email, password) {
     return new Promise((resolve, reject) => {
       return bcrypt.compare(password, user.password, (error, result) => {
         if (!result) {
+          // Sends 'password' back to add to errors object
           return reject('password');
         } else {
           return resolve(user);

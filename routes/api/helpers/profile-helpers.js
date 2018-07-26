@@ -1,7 +1,5 @@
-// Load Models
+// Load profile models
 const Profile = require('../../../models/Profile');
-const User = require('../../../models/User');
-
 // Load functions
 const profileFields = require('./functions/profileFields');
 

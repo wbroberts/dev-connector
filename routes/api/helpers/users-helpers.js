@@ -95,7 +95,8 @@ const login = (req, res) => {
       );
     })
     .catch(error => {
-      // Error is either email not found or incorrect password
+      // Error returned from checkCredentials is either email not found
+      // or incorrect password. If error, add it to the errors object.
       error === 'email'
         ? (errors.email = 'User not found')
         : (errors.password = 'Password incorrect');
