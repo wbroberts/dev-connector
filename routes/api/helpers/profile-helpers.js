@@ -2,6 +2,7 @@
 const Profile = require('../../../models/Profile');
 // Load functions
 const profileFields = require('./functions/profileFields');
+const profileValidation = require('../../../validation/profileValidation');
 
 // GET '/api/profile'
 const getUserProfile = (req, res) => {
@@ -10,19 +11,26 @@ const getUserProfile = (req, res) => {
   Profile.findOne({ user: req.user.id })
     .then(profile => {
       if (!profile) {
-        errors.noProfile = 'No profile for this user';
+        errors.profile = 'Could not find profile';
         return res.status(401).json(errors);
       }
       res.status(200).json({ profile });
     })
     .catch(error => {
-      res.status(400).json({ error });
+      errors.error = error;
+      res.status(400).json(errors);
     });
 };
 
 // POST '/api/profile'
 const createUserProfile = (req, res) => {
   const profileData = profileFields(req.user, req.body);
+
+  const { errors, isValid } = profileValidation(profileData);
+  // Check req.body for errors
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
 
   const newProfile = new Profile(profileData);
 
@@ -48,11 +56,13 @@ const createUserProfile = (req, res) => {
           });
         })
         .catch(error => {
-          res.status(400).json({ error });
+          errors.error = error;
+          res.status(400).json(errors);
         });
     })
     .catch(error => {
-      res.status(400).json({ error });
+      errors.error = error;
+      res.status(400).json(error);
     });
 };
 

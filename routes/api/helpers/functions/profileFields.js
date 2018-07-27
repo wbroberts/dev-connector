@@ -19,12 +19,12 @@ const profileFields = (reqUser, reqBody) => {
   profile.user = reqUser.id;
   profile.handle = handle;
   profile.status = status;
+  profile.skills = skills.split(',');
 
   // These are the optional fields for a profile
   if (company) profile.company = company;
   if (website) profile.website = webiste;
   if (location) profile.location = location;
-  if (skills) profile.skills = skills.split(',');
   if (bio) profile.bio = bio;
   if (githubusername) profile.githubusername = githubusername;
 
