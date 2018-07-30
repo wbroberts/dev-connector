@@ -53,7 +53,8 @@ const registerUser = (req, res) => {
 
       res.status(201).json(userData);
     })
-    .catch(() => {
+    .catch(error => {
+      errors.error = error;
       res.status(400).json({ errors });
     });
 };

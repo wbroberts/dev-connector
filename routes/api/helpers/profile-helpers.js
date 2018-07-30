@@ -1,5 +1,6 @@
 // Load profile models
 const Profile = require('../../../models/Profile');
+
 // Load functions
 const profileFields = require('./functions/profileFields');
 const profileValidation = require('../../../validation/profileValidation');
@@ -8,14 +9,16 @@ const profileValidation = require('../../../validation/profileValidation');
 const getUserProfile = (req, res) => {
   const errors = {};
 
-  Profile.findOne({ user: req.user.id }).then(profile => {
-    if (!profile) {
-      errors.profile = 'Profile not found';
-      return res.status(401).json({ errors });
-    }
-    // Profile was found
-    res.status(200).json({ profile });
-  });
+  Profile.findOne({ user: req.user.id })
+    .populate('users')
+    .then(profile => {
+      if (!profile) {
+        errors.profile = 'Profile not found';
+        return res.status(401).json({ errors });
+      }
+      // Profile was found
+      res.status(200).json({ profile });
+    });
 };
 
 // POST '/api/profile'
@@ -49,7 +52,7 @@ const createUserProfile = (req, res) => {
     })
     // Save the new profile--everything passed
     .then(() => newProfile.save())
-    .then(profile => res.status.json({ profile }))
+    .then(profile => res.status(200).json({ profile }))
     .catch(() => res.status(400).json({ errors }));
 };
 
@@ -83,7 +86,7 @@ const updateUserProfile = (req, res) => {
     .then(updatedProfile => {
       // In case a PUT method is sent to update a non-existent profile
       if (updatedProfile === null) {
-        errors.profile = 'Profile not found';
+        errors.profile = 'No profile to update';
         throw Error(errors);
       }
 
