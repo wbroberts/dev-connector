@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const db = process.env.MONGO_URI;
 
+mongoose.Promise = require('bluebird');
+
 mongoose
   .connect(
     db,
@@ -9,7 +11,5 @@ mongoose
   )
   .then(() => console.log('MongoDB connected'))
   .catch(e => console.log(e));
-
-mongoose.Promise = global.Promise;
 
 module.exports = mongoose;

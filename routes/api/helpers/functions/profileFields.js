@@ -17,7 +17,7 @@ const profileFields = (reqUser, reqBody) => {
 
   // These are the required fields for a profile
   profile.user = reqUser.id;
-  profile.handle = handle;
+  profile.handle = handle.toLowerCase();
   profile.status = status;
   profile.skills = skills.split(',');
 

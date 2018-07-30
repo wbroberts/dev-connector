@@ -3,7 +3,8 @@ const passport = require('passport');
 
 const {
   getUserProfile,
-  createUserProfile
+  createUserProfile,
+  updateUserProfile
 } = require('./helpers/profile-helpers');
 
 router.get('/test', (req, res) => {
@@ -20,6 +21,7 @@ router.all('/', passport.authenticate('jwt', { session: false }));
 router
   .route('/')
   .get(getUserProfile)
-  .post(createUserProfile);
+  .post(createUserProfile)
+  .put(updateUserProfile);
 
 module.exports = router;
