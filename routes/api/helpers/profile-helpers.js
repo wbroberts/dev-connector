@@ -8,19 +8,14 @@ const profileValidation = require('../../../validation/profileValidation');
 const getUserProfile = (req, res) => {
   const errors = {};
 
-  Profile.findOne({ user: req.user.id })
-    .then(profile => {
-      if (!profile) {
-        errors.profile = 'Profile not found';
-        return res.status(401).json(errors);
-      }
-      // Profile was found
-      res.status(200).json({ profile });
-    })
-    .catch(error => {
-      errors.error = error;
-      res.status(400).json(errors);
-    });
+  Profile.findOne({ user: req.user.id }).then(profile => {
+    if (!profile) {
+      errors.profile = 'Profile not found';
+      return res.status(401).json({ errors });
+    }
+    // Profile was found
+    res.status(200).json({ profile });
+  });
 };
 
 // POST '/api/profile'
@@ -30,39 +25,32 @@ const createUserProfile = (req, res) => {
 
   // Exit out early due to errors
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors });
   }
 
   const newProfile = new Profile(profileData);
 
   Profile.findOne({ user: req.user.id })
     .then(profile => {
-      // See if the user already has a profile
+      // Error if the user has a profile
       if (profile) {
         errors.profile = 'Profile already exists';
-        return res.status(400).json(errors);
+        throw Error(errors);
       }
-
-      return Profile.findOne({ handle: profileData.handle });
     })
+    // See if the handle is available for the new profile
+    .then(() => Profile.findOne({ handle: profileData.handle }))
     .then(handle => {
-      // See if the handle the user wants is already taken
+      // Error if handle is taken
       if (handle) {
         errors.handle = 'Handle not available';
-        return res.status(400).json(errors);
+        throw Error(errors);
       }
-
-      // Save the new profile--everything passed
-      newProfile
-        .save()
-        .then(profile => {
-          res.status(201).json(profile);
-        })
-        .catch(error => {
-          errors.error = error;
-          res.status(400).json(errors);
-        });
-    });
+    })
+    // Save the new profile--everything passed
+    .then(() => newProfile.save())
+    .then(profile => res.status.json({ profile }))
+    .catch(() => res.status(400).json({ errors }));
 };
 
 const updateUserProfile = (req, res) => {
@@ -71,26 +59,37 @@ const updateUserProfile = (req, res) => {
 
   // Exit out early due to errors
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors });
   }
 
-  Profile.findOne({ handle: profileData.handle }).then(profile => {
-    // Check to see if the handle is already in use and that it is not
-    // the current user.
-    if (profile && profile.user.toString() !== req.user.id.toString()) {
-      errors.handle = 'Handle not available';
-      return res.status(400).json(errors);
-    }
+  Profile.findOne({ handle: profileData.handle })
+    .then(profile => {
+      // Check to see if the handle is already in use and that it is not
+      // the current user.
+      if (profile && profile.user.toString() !== req.user.id.toString()) {
+        errors.handle = 'Handle not available';
+        throw Error(errors);
+      }
+    })
+    // Update profile since handle did not change
+    // or is available
+    .then(() =>
+      Profile.findOneAndUpdate(
+        { user: req.user.id },
+        { $set: profileData },
+        { new: true }
+      )
+    )
+    .then(updatedProfile => {
+      // In case a PUT method is sent to update a non-existent profile
+      if (updatedProfile === null) {
+        errors.profile = 'Profile not found';
+        throw Error(errors);
+      }
 
-    // Update the profile if
-    Profile.findOneAndUpdate(
-      { user: req.user.id },
-      { $set: profileData },
-      { new: true }
-    ).then(updatedProfile => {
-      res.status(200).json(updatedProfile);
-    });
-  });
+      res.status(200).json({ updatedProfile });
+    })
+    .catch(() => res.status(400).json({ errors }));
 };
 
 module.exports = {
