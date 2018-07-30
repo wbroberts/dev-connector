@@ -17,49 +17,44 @@ const registerUser = (req, res) => {
 
   const { email, name, password, password2 } = req.body;
 
-  User.findOne({ email })
-    .then(user => {
-      // Check if email is already in the database
-      if (user) {
-        return res.status(400).json({
-          email: 'Email already exists'
-        });
-      }
-      // Find or create the generic avatar
-      const avatar = gravatar.url(email, {
-        s: '200',
-        r: 'pg',
-        d: 'mm'
+  User.findOne({ email }).then(user => {
+    // Check if email is already in the database
+    if (user) {
+      return res.status(400).json({
+        email: 'Email already exists'
       });
-      // Create the new user object
-      const newUser = new User({ name, email, password, avatar });
-      // Save the new user to the database
-      newUser
-        .save()
-        .then(result => {
-          res.json({
-            message: 'Success',
-            // Sends everything but the password
-            user: {
-              _id: result._id,
-              email: result.email,
-              name: result.name,
-              avatar: {
-                url: result.avatar
-              },
-              dateCreated: result.date
-            }
-          });
-        })
-        .catch(error => {
-          // Save newUser error
-          res.status(400).json({ error });
-        });
-    })
-    .catch(error => {
-      // FindOne error
-      res.json({ error });
+    }
+    // Find or create the generic avatar
+    const avatar = gravatar.url(email, {
+      s: '200',
+      r: 'pg',
+      d: 'mm'
     });
+    // Create the new user object
+    const newUser = new User({ name, email, password, avatar });
+    // Save the new user to the database
+    newUser
+      .save()
+      .then(result => {
+        res.json({
+          message: 'Success',
+          // Sends everything but the password
+          user: {
+            _id: result._id,
+            email: result.email,
+            name: result.name,
+            avatar: {
+              url: result.avatar
+            },
+            dateCreated: result.date
+          }
+        });
+      })
+      .catch(error => {
+        // Save newUser error
+        res.status(400).json({ error });
+      });
+  });
 };
 
 // POST '/api/users/login'
