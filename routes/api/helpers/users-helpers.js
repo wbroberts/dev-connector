@@ -63,7 +63,7 @@ const login = (req, res) => {
   const { errors, isValid } = loginValidation(req.body);
   // Check if there are any errors
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors });
   }
 
   const { email, password } = req.body;
@@ -97,7 +97,7 @@ const login = (req, res) => {
         ? (errors.email = 'User not found')
         : (errors.password = 'Password incorrect');
 
-      res.status(404).json(errors);
+      res.status(404).json({ errors });
     });
 };
 
