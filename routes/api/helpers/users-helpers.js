@@ -10,51 +10,52 @@ const loginValidation = require('../../../validation/loginValidation');
 // POST '/api/users/register'
 const registerUser = (req, res) => {
   const { errors, isValid } = userRegistrationValidation(req.body);
+
   // Check if there are any errors
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors });
   }
 
-  const { email, name, password, password2 } = req.body;
+  const { email, name, password } = req.body;
 
-  User.findOne({ email }).then(user => {
-    // Check if email is already in the database
-    if (user) {
-      return res.status(400).json({
-        email: 'Email already exists'
+  User.findOne({ email })
+    .then(user => {
+      // Check if email is already in the database
+      if (user) {
+        errors.email = 'Email already in use';
+        throw Error(errors);
+      }
+    })
+    .then(() => {
+      // Find or create the generic avatar
+      const avatar = gravatar.url(email, {
+        s: '200',
+        r: 'pg',
+        d: 'mm'
       });
-    }
-    // Find or create the generic avatar
-    const avatar = gravatar.url(email, {
-      s: '200',
-      r: 'pg',
-      d: 'mm'
+      // Create the new user object
+      const newUser = new User({ name, email, password, avatar });
+
+      return newUser.save();
+    })
+    .then(user => {
+      const userData = {
+        newUser: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+          avatar: {
+            url: user.avatar
+          },
+          dateCreated: user.date
+        }
+      };
+
+      res.status(201).json(userData);
+    })
+    .catch(() => {
+      res.status(400).json({ errors });
     });
-    // Create the new user object
-    const newUser = new User({ name, email, password, avatar });
-    // Save the new user to the database
-    newUser
-      .save()
-      .then(result => {
-        res.json({
-          message: 'Success',
-          // Sends everything but the password
-          user: {
-            _id: result._id,
-            email: result.email,
-            name: result.name,
-            avatar: {
-              url: result.avatar
-            },
-            dateCreated: result.date
-          }
-        });
-      })
-      .catch(error => {
-        // Save newUser error
-        res.status(400).json({ error });
-      });
-  });
 };
 
 // POST '/api/users/login'
