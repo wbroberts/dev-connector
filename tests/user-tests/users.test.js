@@ -8,9 +8,9 @@ const { users, populateUsers } = require('./seed-users/seed-users');
 // Clears database and enters in two users
 beforeEach(populateUsers);
 
-describe('Users', () => {
-  // User registration
-  describe('POST /api/users/register', () => {
+// User registration
+describe('POST /api/users/register', () => {
+  describe('Register SUCCESS', () => {
     // Successfully register a user
     it('should register a user', done => {
       const user = {
@@ -39,9 +39,10 @@ describe('Users', () => {
             .catch(error => done(error));
         });
     });
+  });
 
-    // Unsuccessfully register a user
-    it('should return an errors object', done => {
+  describe('Register FAILURE', () => {
+    it('should return multpile errors', done => {
       const user = {
         name: 'w',
         email: 'fake',
@@ -55,15 +56,75 @@ describe('Users', () => {
         .expect(400)
         .expect(res => {
           expect(Object.keys(res.body.errors).length).toBe(3);
-          expect(res.body.errors).toBeDefined();
+          expect(res.body.errors.name).toBeDefined();
+          expect(res.body.errors.email).toBeDefined();
+          expect(res.body.errors.password).toBeDefined();
+        })
+        .end(done);
+    });
+
+    it('should return EMAIL error', done => {
+      const user = {
+        name: 'fake user',
+        email: 'fake@email',
+        password: '123456',
+        password2: '123456'
+      };
+
+      request(app)
+        .post('/api/users/register')
+        .send(user)
+        .expect(400)
+        .expect(res => {
+          expect(Object.keys(res.body.errors).length).toBe(1);
+          expect(res.body.errors.email).toBeDefined();
+        })
+        .end(done);
+    });
+
+    it('should return PASSWORD error', done => {
+      const user = {
+        name: 'fake user',
+        email: 'fake@email.com',
+        password: '1234',
+        password2: '1234'
+      };
+
+      request(app)
+        .post('/api/users/register')
+        .send(user)
+        .expect(400)
+        .expect(res => {
+          expect(Object.keys(res.body.errors).length).toBe(1);
+          expect(res.body.errors.password).toBeDefined();
+        })
+        .end(done);
+    });
+
+    it('should return PASSWORDS (not matching) error', done => {
+      const user = {
+        name: 'fake user',
+        email: 'fake@email.com',
+        password: '123456',
+        password2: '12347684'
+      };
+
+      request(app)
+        .post('/api/users/register')
+        .send(user)
+        .expect(400)
+        .expect(res => {
+          expect(Object.keys(res.body.errors).length).toBe(1);
+          expect(res.body.errors.passwords).toBeDefined();
         })
         .end(done);
     });
   });
+});
 
-  // User login
-  describe('POST /api/users/login', () => {
-    // Successfully log the user in
+// User login
+describe('POST /api/users/login', () => {
+  describe('Login SUCCESS', () => {
     it('should log in the user', done => {
       const loginCredentials = {
         email: users[0].email,
@@ -79,9 +140,11 @@ describe('Users', () => {
         })
         .end(done);
     });
+  });
 
+  describe('Login FAILURE', () => {
     // Wrong password
-    it('should NOT log in the user (password)', done => {
+    it('should return PASSWORD error', done => {
       const loginCredentials = {
         email: users[0].email,
         password: users[1].password
@@ -99,7 +162,7 @@ describe('Users', () => {
     });
 
     // Email not found
-    it('should NOT log in the user (email)', done => {
+    it('should return EMAIL error', done => {
       const loginCredentials = {
         email: 'notAUser@fake.com',
         password: 'password'
