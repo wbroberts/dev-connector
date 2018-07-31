@@ -7,15 +7,15 @@ const users = [
     _id: new ObjectID(),
     name: 'User 1',
     email: 'user1@email.com',
-    password: 'password',
-    password2: 'password'
+    password: 'user1Password',
+    password2: 'user1Password'
   },
   {
     _id: new ObjectID(),
     name: 'User 2',
     email: 'user2@email.com',
-    password: 'password',
-    password2: 'password'
+    password: 'user2Password',
+    password2: 'user2Password'
   }
 ];
 
@@ -30,4 +30,7 @@ const populateUsers = done => {
     .then(() => done());
 };
 
-module.exports = populateUsers;
+module.exports = {
+  users,
+  populateUsers
+};

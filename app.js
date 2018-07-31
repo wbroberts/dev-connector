@@ -6,8 +6,10 @@ require('./db/mongoose');
 
 const app = express();
 
-// Log server requests to console
-app.use(morgan('dev'));
+// Log server requests to console when not testing
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
 
 // Body parser
 app.use(express.urlencoded({ extended: false }));
