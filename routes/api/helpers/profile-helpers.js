@@ -1,3 +1,5 @@
+const { ObjectID } = require('mongodb');
+
 // Load profile models
 const Profile = require('../../../models/Profile');
 
@@ -111,7 +113,31 @@ const getProfileByHandle = (req, res) => {
         throw Error();
       }
 
-      res.status(200).json(profile);
+      res.status(200).json({ profile });
+    })
+    .catch(() => {
+      res.status(404).json({ errors });
+    });
+};
+
+const getProfileByUserId = (req, res) => {
+  const errors = {};
+  const id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    errors.notValid = 'Not a valid id';
+    return res.status(400).json({ errors });
+  }
+
+  Profile.findOne({ user: id })
+    .populate('user', ['name', 'avatar'])
+    .then(profile => {
+      if (!profile) {
+        errors.profile = 'No profile found';
+        throw Error();
+      }
+
+      res.status(200).json({ profile });
     })
     .catch(() => {
       res.status(404).json({ errors });
@@ -122,6 +148,7 @@ const getAllProfiles = (req, res) => {
   const errors = {};
 
   Profile.find({})
+    .populate('user', ['name', 'avatar'])
     .then(profiles => {
       if (profiles.length === 0) {
         errors.profiles = 'There are no profiles yet';
@@ -138,5 +165,6 @@ module.exports = {
   createUserProfile,
   updateUserProfile,
   getProfileByHandle,
+  getProfileByUserId,
   getAllProfiles
 };

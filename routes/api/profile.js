@@ -6,6 +6,7 @@ const {
   createUserProfile,
   updateUserProfile,
   getProfileByHandle,
+  getProfileByUserId,
   getAllProfiles
 } = require('./helpers/profile-helpers');
 
@@ -26,11 +27,17 @@ router
   .post(createUserProfile)
   .put(updateUserProfile);
 
-// ROUTE    /api/profile/:handle
+// ROUTE    /api/profile/handle/:handle
 // DESC     Return a profile by user handle
 // METHODS  GET
 // ACCESS   Public
 router.route('/handle/:handle').get(getProfileByHandle);
+
+// ROUTE    /api/profile/user/:id
+// DESC     Return a profile by user id
+// METHODS  GET
+// ACCESS   Public
+router.route('/user/:id').get(getProfileByUserId);
 
 // ROUTE    /api/profile/all
 // DESC     Returns all profiles

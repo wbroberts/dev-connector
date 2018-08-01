@@ -216,3 +216,58 @@ describe('PUT /api/profile', () => {
 
   describe('Update profile FAILURE', () => {});
 });
+
+describe('GET /api/profile/user/:id', () => {
+  describe('Get profile by ID SUCCESS', () => {
+    it('id should return the profile', done => {
+      request(app)
+        .get(`/api/profile/user/${users[0]._id}`)
+        .expect(200)
+        .expect(res => {
+          expect(res.body.profile).toBeDefined();
+          expect(res.body.profile.user.name).toBe(users[0].name);
+        })
+        .end(done);
+    });
+  });
+
+  describe('Get profile by ID FAILURE', () => {
+    it('id should return ID error', done => {
+      request(app)
+        .get(`/api/profile/user/${users[0]._id + '1'}`)
+        .expect(400)
+        .expect(res => {
+          expect(res.body.errors.notValid).toBeDefined();
+        })
+        .end(done);
+    });
+  });
+});
+
+describe('GET /api/profile/handle/:handle', () => {
+  it('handle should return the profile', done => {
+    request(app)
+      .get(`/api/profile/handle/${profiles[1].handle}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.profile).toBeDefined();
+        expect(res.body.profile.user._id.toString()).toBe(
+          users[1]._id.toString()
+        );
+      })
+      .end(done);
+  });
+});
+
+describe('GET /api/profile/all', () => {
+  it('should return all profiles', done => {
+    request(app)
+      .get('/api/profile/all')
+      .expect(200)
+      .expect(res => {
+        expect(res.body.count).toBe(2);
+        expect(res.body.profiles.length).toBe(2);
+      })
+      .end(done);
+  });
+});
