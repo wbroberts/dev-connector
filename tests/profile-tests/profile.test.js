@@ -37,7 +37,7 @@ describe('GET /api/profile', () => {
         .expect(200)
         .expect(res => {
           expect(res.body.profile).toBeDefined();
-          expect(res.body.profile.user).toBe(users[0]._id.toString());
+          expect(res.body.profile.user.name).toBe(users[0].name);
         })
         .end(done);
     });

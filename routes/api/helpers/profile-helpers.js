@@ -40,7 +40,7 @@ const createUserProfile = (req, res) => {
       // Error if the user has a profile
       if (profile) {
         errors.profile = 'Profile already exists';
-        throw Error(errors);
+        throw Error();
       }
     })
     // See if the handle is available for the new profile
@@ -49,7 +49,7 @@ const createUserProfile = (req, res) => {
       // Error if handle is taken
       if (handle) {
         errors.handle = 'Handle not available';
-        throw Error(errors);
+        throw Error();
       }
     })
     // Save the new profile--everything passed
@@ -75,7 +75,7 @@ const updateUserProfile = (req, res) => {
       // the current user.
       if (profile && profile.user.toString() !== req.user.id.toString()) {
         errors.handle = 'Handle not available';
-        throw Error(errors);
+        throw Error();
       }
     })
     // Update profile since handle did not change
@@ -91,7 +91,7 @@ const updateUserProfile = (req, res) => {
       // In case a PUT method is sent to update a non-existent profile
       if (updatedProfile === null) {
         errors.profile = 'No profile to update';
-        throw Error(errors);
+        throw Error();
       }
 
       res.status(200).json({ updatedProfile });
@@ -99,8 +99,44 @@ const updateUserProfile = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+const getProfileByHandle = (req, res) => {
+  const errors = {};
+  const handle = req.params.handle;
+
+  Profile.findOne({ handle })
+    .populate('user', ['name', 'avatar'])
+    .then(profile => {
+      if (!profile) {
+        errors.handle = 'No profile found';
+        throw Error();
+      }
+
+      res.status(200).json(profile);
+    })
+    .catch(() => {
+      res.status(404).json({ errors });
+    });
+};
+
+const getAllProfiles = (req, res) => {
+  const errors = {};
+
+  Profile.find({})
+    .then(profiles => {
+      if (profiles.length === 0) {
+        errors.profiles = 'There are no profiles yet';
+        throw Error();
+      }
+
+      res.status(200).json({ count: profiles.length, profiles });
+    })
+    .catch(() => res.status(404).json({ errors }));
+};
+
 module.exports = {
   getUserProfile,
   createUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  getProfileByHandle,
+  getAllProfiles
 };

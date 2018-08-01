@@ -4,7 +4,9 @@ const passport = require('passport');
 const {
   getUserProfile,
   createUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  getProfileByHandle,
+  getAllProfiles
 } = require('./helpers/profile-helpers');
 
 router.get('/test', (req, res) => {
@@ -13,15 +15,27 @@ router.get('/test', (req, res) => {
   });
 });
 
-// GET   '/api/profile'
-// DESC   GET user profile
-// DEST   POST create profile
-// ACCESS Private
+// ROUTE    /api/profile
+// DESC     User profile routes (authenticated)
+// METHODS  GET, POST, PUT
+// ACCESS   Private
 router.all('/', passport.authenticate('jwt', { session: false }));
 router
   .route('/')
   .get(getUserProfile)
   .post(createUserProfile)
   .put(updateUserProfile);
+
+// ROUTE    /api/profile/:handle
+// DESC     Return a profile by user handle
+// METHODS  GET
+// ACCESS   Public
+router.route('/handle/:handle').get(getProfileByHandle);
+
+// ROUTE    /api/profile/all
+// DESC     Returns all profiles
+// METHODS  GET
+// ACCESS   Public
+router.route('/all').get(getAllProfiles);
 
 module.exports = router;
