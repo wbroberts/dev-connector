@@ -126,5 +126,91 @@ describe('POST /api/profile', () => {
           });
         });
     });
+
+    it('should return HANDLE (in use) error', done => {
+      const profileData = {
+        user: users[2]._id,
+        handle: profiles[0].handle,
+        status: 'Employed',
+        skills: 'eating, food',
+        bio: 'Just a bio'
+      };
+
+      authenticatedUser2
+        .post('/api/profile')
+        .set('authorization', token2)
+        .send(profileData)
+        .expect(400)
+        .expect(res => {
+          expect(res.body.errors.handle).toBeDefined();
+        })
+        .end(() => {
+          Profile.find({}).then(profiles => {
+            expect(profiles.length).toBe(2);
+            done();
+          });
+        });
+    });
+
+    it('should return PROFILE (already exists) error', done => {
+      const profileData = {
+        user: users[0]._id,
+        handle: 'handle',
+        status: 'Employed',
+        skills: 'eating, food',
+        bio: 'Just a bio'
+      };
+
+      authenticatedUser1
+        .post('/api/profile')
+        .set('authorization', token1)
+        .send(profileData)
+        .expect(400)
+        .expect(res => {
+          expect(res.body.errors.profile).toBeDefined();
+        })
+        .end(() => {
+          Profile.find({}).then(profiles => {
+            expect(profiles.length).toBe(2);
+            done();
+          });
+        });
+    });
   });
+});
+
+describe('PUT /api/profile', () => {
+  describe('Update profile SUCCESS', () => {
+    it('should update the profile', done => {
+      const profileUpdate = {
+        user: users[1]._id,
+        handle: 'updated-handle',
+        status: 'new status',
+        skills: 'sleeping, eating, drinking',
+        bio: 'Just an updated bio',
+        social: {
+          instagram: 'instagram.com'
+        }
+      };
+
+      authenticatedUser1
+        .put('/api/profile')
+        .set('authorization', token1)
+        .send(profileUpdate)
+        .expect(200)
+        .expect(res => {
+          expect(res.body.updatedProfile).toBeDefined();
+        })
+        .end(() => {
+          Profile.find({}).then(profiles => {
+            expect(profiles[1].status).toBe(profileUpdate.status);
+            expect(profiles[1].handle).toBe(profileUpdate.handle);
+            expect(profiles[1].social.instagram).toBeDefined();
+            done();
+          });
+        });
+    });
+  });
+
+  describe('Update profile FAILURE', () => {});
 });
