@@ -6,9 +6,11 @@ const Profile = require('../../models/Profile');
 const { profiles, populateProfiles } = require('../seed-data/seed-profiles');
 const { users } = require('../seed-data/seed-users');
 
+// This is for a user that already has a profile
 const authenticatedUser1 = request.agent(app);
-const authenticatedUser2 = request.agent(app);
 let token1;
+// This is for a user that does not have a profile
+const authenticatedUser2 = request.agent(app);
 let token2;
 
 before(populateProfiles);
