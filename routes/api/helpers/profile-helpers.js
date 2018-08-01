@@ -11,7 +11,7 @@ const getUserProfile = (req, res) => {
   const errors = {};
 
   Profile.findOne({ user: req.user.id })
-    .populate('users')
+    .populate('user', ['name', 'avatar'])
     .then(profile => {
       if (!profile) {
         errors.profile = 'Profile not found';
