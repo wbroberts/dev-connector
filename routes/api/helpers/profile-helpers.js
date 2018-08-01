@@ -6,6 +6,7 @@ const profileFields = require('./functions/profileFields');
 const profileValidation = require('../../../validation/profileValidation');
 
 // GET '/api/profile'
+// Returns the profile of the logged in user
 const getUserProfile = (req, res) => {
   const errors = {};
 
@@ -22,6 +23,7 @@ const getUserProfile = (req, res) => {
 };
 
 // POST '/api/profile'
+// Creates profile
 const createUserProfile = (req, res) => {
   const profileData = profileFields(req.user, req.body);
   const { errors, isValid } = profileValidation(profileData);
@@ -56,6 +58,8 @@ const createUserProfile = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// PUT '/api/profile'
+// Updates the profile
 const updateUserProfile = (req, res) => {
   const profileData = profileFields(req.user, req.body);
   const { errors, isValid } = profileValidation(profileData);

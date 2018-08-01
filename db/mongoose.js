@@ -5,13 +5,15 @@ const c = require('ansi-colors');
 let db;
 let dbMessage;
 
-// Set environment
+// Set environment (NODE_ENV becomes 'test' for testing)
 const env = process.env.NODE_ENV || 'development';
+
 // Set the database to use
 if (env === 'development') {
   db = process.env.MONGO_URI;
   dbMessage = c.cyan('Development');
 } else if (env === 'test') {
+  process.env.PORT = 5000;
   db = process.env.MONGO_URI_TEST;
   dbMessage = c.cyan('Testing');
 }

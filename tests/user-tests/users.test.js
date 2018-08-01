@@ -1,12 +1,23 @@
 const expect = require('expect');
 const request = require('supertest');
+const c = require('ansi-colors');
 
 const app = require('../../app');
 const User = require('../../models/User');
-const { users, populateUsers } = require('./seed-users/seed-users');
+const { users, populateUsers } = require('../seed-data/seed-users');
+
+before('Connect to server', done => {
+  const port = 5000;
+
+  Promise.resolve(
+    app.listen(port, () => console.log(`Server is up on port ${c.cyan(port)}`))
+  ).then(() => {
+    done();
+  });
+});
 
 // Clears database and enters in two users
-beforeEach(populateUsers);
+before(populateUsers);
 
 // User registration
 describe('POST /api/users/register', () => {
@@ -32,8 +43,8 @@ describe('POST /api/users/register', () => {
 
           User.find()
             .then(users => {
-              expect(users.length).toBe(3);
-              expect(users[2].email).toBe(user.email);
+              expect(users.length).toBe(4);
+              expect(users[3].email).toBe(user.email);
               done();
             })
             .catch(error => done(error));
