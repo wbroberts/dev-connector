@@ -1,3 +1,4 @@
+const replaceWhitespace = require('./replaceWhitespace');
 // Takes in the req.user and req.body as params.
 // Returns a profile object for creating a new profile.
 const profileFields = (reqUser, reqBody) => {
@@ -17,9 +18,9 @@ const profileFields = (reqUser, reqBody) => {
 
   // These are the required fields for a profile
   profile.user = reqUser.id;
-  profile.handle = handle.toLowerCase();
   profile.status = status;
   profile.skills = skills.split(',');
+  profile.handle = replaceWhitespace(handle);
 
   // These are the optional fields for a profile
   if (company) profile.company = company;

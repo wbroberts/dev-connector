@@ -160,11 +160,44 @@ const getAllProfiles = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
+const addExperienceToProfile = (req, res) => {
+  const errors = {};
+
+  Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      if (!profile) {
+        errors.profile = 'No profile found';
+        throw Error();
+      }
+
+      const addExp = {
+        title,
+        company,
+        location,
+        from,
+        to,
+        current,
+        description
+      };
+
+      profile.experience.unshift(addExp);
+
+      return profile.save();
+    })
+    .then(profile => {
+      res.status(200).json({ profile });
+    })
+    .catch(() => {
+      res.status(400).json({ errors });
+    });
+};
+
 module.exports = {
   getUserProfile,
   createUserProfile,
   updateUserProfile,
   getProfileByHandle,
   getProfileByUserId,
-  getAllProfiles
+  getAllProfiles,
+  addExperienceToProfile
 };
