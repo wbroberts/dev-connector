@@ -273,10 +273,30 @@ describe('GET /api/profile/all', () => {
 });
 
 describe('POST /api/profile/experience', () => {
-  it("should add experience to the user's profile", done => {
+  it('should add experience to the profile', done => {
     const experience = {
       title: 'A job',
       company: 'A Company',
+      from: 'Aug 2',
+      current: true
+    };
+
+    authenticatedUser1
+      .post('/api/profile/experience')
+      .set('authorization', token1)
+      .send(experience)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.profile.experience[0]).toBeDefined();
+        expect(res.body.profile.experience[0].title).toBe(experience.title);
+      })
+      .end(done);
+  });
+
+  it('should NOT add experience to the profile', done => {
+    const experience = {
+      title: '',
+      company: 'A company',
       from: 'Aug 2'
     };
 
@@ -284,9 +304,10 @@ describe('POST /api/profile/experience', () => {
       .post('/api/profile/experience')
       .set('authorization', token1)
       .send(experience)
+      .expect(400)
       .expect(res => {
-        expect(res.body.profile.experience[0]).toBeDefined();
-        expect(res.body.profile.experience[0].title).toBe(experience.title);
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.title).toBe('Job title is required');
       })
       .end(done);
   });
