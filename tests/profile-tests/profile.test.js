@@ -271,3 +271,23 @@ describe('GET /api/profile/all', () => {
       .end(done);
   });
 });
+
+describe('POST /api/profile/experience', () => {
+  it("should add experience to the user's profile", done => {
+    const experience = {
+      title: 'A job',
+      company: 'A Company',
+      from: 'Aug 2'
+    };
+
+    authenticatedUser1
+      .post('/api/profile/experience')
+      .set('authorization', token1)
+      .send(experience)
+      .expect(res => {
+        expect(res.body.profile.experience[0]).toBeDefined();
+        expect(res.body.profile.experience[0].title).toBe(experience.title);
+      })
+      .end(done);
+  });
+});

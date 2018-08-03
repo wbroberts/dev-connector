@@ -6,6 +6,8 @@ const Profile = require('../../../models/Profile');
 // Load functions
 const profileFields = require('./functions/profileFields');
 const profileValidation = require('../../../validation/profileValidation');
+const experienceValidation = require('../../../validation/experienceValidation');
+const experienceFields = require('./functions/experienceFields');
 
 // GET '/api/profile'
 // Returns the profile of the logged in user
@@ -101,6 +103,7 @@ const updateUserProfile = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// Searches for the profile by handle
 const getProfileByHandle = (req, res) => {
   const errors = {};
   const handle = req.params.handle;
@@ -120,6 +123,7 @@ const getProfileByHandle = (req, res) => {
     });
 };
 
+// Searches for profile by user ID
 const getProfileByUserId = (req, res) => {
   const errors = {};
   const id = req.params.id;
@@ -144,6 +148,7 @@ const getProfileByUserId = (req, res) => {
     });
 };
 
+// Returns all profiles
 const getAllProfiles = (req, res) => {
   const errors = {};
 
@@ -160,8 +165,14 @@ const getAllProfiles = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
+// Adds professional experience to the user's profile
 const addExperienceToProfile = (req, res) => {
-  const errors = {};
+  const experienceData = experienceFields(req.body);
+  const { errors, isValid } = experienceValidation(experienceData);
+
+  if (!isValid) {
+    return res.status(400).json({ errors });
+  }
 
   Profile.findOne({ user: req.user.id })
     .then(profile => {
@@ -170,25 +181,16 @@ const addExperienceToProfile = (req, res) => {
         throw Error();
       }
 
-      const addExp = {
-        title,
-        company,
-        location,
-        from,
-        to,
-        current,
-        description
-      };
-
-      profile.experience.unshift(addExp);
-
-      return profile.save();
+      // Add experience to the start of the array
+      profile.experience.unshift(experienceData);
+      return profile;
     })
+    .then(profile => profile.save())
     .then(profile => {
       res.status(200).json({ profile });
     })
-    .catch(() => {
-      res.status(400).json({ errors });
+    .catch(err => {
+      res.status(400).json({ errors, err });
     });
 };
 
