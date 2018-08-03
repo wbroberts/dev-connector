@@ -14,13 +14,14 @@ const profileValidation = obj => {
   skills = !isEmpty(skills) ? skills : '';
 
   // Handle errors
+  if (!validator.isLength(handle, { min: 2, max: 40 })) {
+    errors.handle = 'Handle must be between 2 and 40 characters';
+  }
+
   if (validator.isEmpty(handle)) {
     errors.handle = 'Handle is required';
   }
 
-  if (!validator.isLength(handle, { min: 2, max: 40 })) {
-    errors.handle = 'Handle must be between 2 and 40 characters';
-  }
   // Status errors
   if (validator.isEmpty(status)) {
     errors.status = 'Status is required';
@@ -31,7 +32,7 @@ const profileValidation = obj => {
   }
 
   // Make sure website is a valid URL
-  if (!isEmpty(website)) {
+  if (website && !validator.isEmpty(website)) {
     if (!validator.isURL(website)) {
       errors.website = 'Not a valid URL';
     }

@@ -3,7 +3,7 @@ const expect = require('expect');
 const experienceValidation = require('../../validation/experienceValidation');
 
 describe('experienceValidation function', () => {
-  it('should return no errors', () => {
+  it('should not return any errors', () => {
     const experience = {
       title: 'A Job',
       company: 'Forturn 500 Company',
