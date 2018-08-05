@@ -7,7 +7,7 @@ const Profile = require('../../../models/Profile');
 const profileFields = require('./functions/profileFields');
 const profileValidation = require('../../../validation/profileValidation');
 const experienceValidation = require('../../../validation/experienceValidation');
-const experienceFields = require('./functions/experienceFields');
+const educationValidation = require('../../../validation/educationValidation');
 
 // GET '/api/profile'
 // Returns the profile of the logged in user
@@ -165,10 +165,9 @@ const getAllProfiles = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
-// Adds professional experience to the user's profile
+// Adds experience to profile
 const addExperienceToProfile = (req, res) => {
-  const experienceData = experienceFields(req.body);
-  const { errors, isValid } = experienceValidation(experienceData);
+  const { errors, isValid } = experienceValidation(req.body);
 
   if (!isValid) {
     return res.status(400).json({ errors });
@@ -182,15 +181,42 @@ const addExperienceToProfile = (req, res) => {
       }
 
       // Add experience to the start of the array
-      profile.experience.unshift(experienceData);
+      profile.experience.unshift(req.body);
       return profile;
     })
     .then(profile => profile.save())
     .then(profile => {
       res.status(200).json({ profile });
     })
-    .catch(err => {
-      res.status(400).json({ errors, err });
+    .catch(() => {
+      res.status(400).json({ errors });
+    });
+};
+
+const addEducationToProfile = (req, res) => {
+  const { errors, isValid } = educationValidation(req.body);
+
+  if (!isValid) {
+    return res.status(400).json({ errors });
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      if (!profile) {
+        errors.profile = 'No profile found';
+        throw Error();
+      }
+
+      // Add experience to the start of the array
+      profile.education.unshift(req.body);
+      return profile;
+    })
+    .then(profile => profile.save())
+    .then(profile => {
+      res.status(200).json({ profile });
+    })
+    .catch(() => {
+      res.status(400).json({ errors });
     });
 };
 

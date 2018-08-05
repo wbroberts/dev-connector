@@ -18,7 +18,7 @@ describe('experienceValidation function', () => {
   it('should return errors (title, company)', () => {
     const experience = {
       title: '',
-      company: 'F',
+      company: '',
       from: 'Aug 2010',
       to: 'current'
     };
@@ -28,7 +28,7 @@ describe('experienceValidation function', () => {
       'Job title is required'
     );
     expect(experienceValidation(experience).errors.company).toBe(
-      'Company name must be between 2 and 30 characters'
+      'Company name is required'
     );
   });
 });

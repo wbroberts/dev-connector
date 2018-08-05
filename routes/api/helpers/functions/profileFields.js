@@ -32,11 +32,7 @@ const profileFields = (reqUser, reqBody) => {
   // Social media optional fields
   profile.social = {};
   if (social) {
-    if (social.youtube) profile.social.youtube = social.youtube;
-    if (social.twitter) profile.social.twitter = social.twitter;
-    if (social.facebook) profile.social.facebook = social.facebook;
-    if (social.linkedin) profile.social.linkedin = social.linkedin;
-    if (social.instagram) profile.social.instagram = social.instagram;
+    Object.keys(social).forEach(key => (profile.social[key] = social[key]));
   }
 
   return profile;
