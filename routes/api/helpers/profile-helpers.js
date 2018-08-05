@@ -227,5 +227,6 @@ module.exports = {
   getProfileByHandle,
   getProfileByUserId,
   getAllProfiles,
-  addExperienceToProfile
+  addExperienceToProfile,
+  addEducationToProfile
 };

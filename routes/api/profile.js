@@ -8,7 +8,8 @@ const {
   getProfileByHandle,
   getProfileByUserId,
   getAllProfiles,
-  addExperienceToProfile
+  addExperienceToProfile,
+  addEducationToProfile
 } = require('./helpers/profile-helpers');
 
 router.get('/test', (req, res) => {
@@ -17,18 +18,24 @@ router.get('/test', (req, res) => {
   });
 });
 
+// Authentication routes
+// Private
+router.all(
+  ['/', '/experience', '/education'],
+  passport.authenticate('jwt', { session: false })
+);
+
 // ROUTE    /api/profile
 // DESC     User profile routes (authenticated)
 // METHODS  GET, POST, PUT
 // ACCESS   Private
-router.all('/', passport.authenticate('jwt', { session: false }));
 router
   .route('/')
   .get(getUserProfile)
   .post(createUserProfile)
   .put(updateUserProfile);
 
-// DESC     Ways to find/get a profile
+// DESC     Ways to find/get a profile(s)
 // METHODS  GET
 // ACCESS   Public
 router.route('/handle/:handle').get(getProfileByHandle); // by handle
@@ -38,7 +45,7 @@ router.route('/all').get(getAllProfiles); // all profiles
 // DESC     Adds experience to user's profile
 // METHODS  POST, DELETE
 // ACCESS   Private
-router.all('/experience', passport.authenticate('jwt', { session: false }));
 router.route('/experience').post(addExperienceToProfile);
+router.route('/education').post(addEducationToProfile);
 
 module.exports = router;
