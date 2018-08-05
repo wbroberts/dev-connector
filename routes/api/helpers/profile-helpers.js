@@ -193,6 +193,45 @@ const addExperienceToProfile = (req, res) => {
     });
 };
 
+const removeExperienceFromProfile = (req, res) => {
+  const errors = {};
+  const experienceId = req.params.expId;
+
+  if (!ObjectID.isValid(experienceId)) {
+    errors.experienceId = 'Not a valid object ID';
+    return res.status(400).json({ errors });
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      if (!profile) {
+        errors.profile = 'No profile found';
+        throw Error();
+      }
+
+      return profile;
+    })
+    .then(profile => {
+      const experienceIndex = profile.experience
+        .map(exp => exp.id)
+        .indexOf(experienceId);
+
+      if (experienceIndex === -1) {
+        errors.experience = 'No experience found';
+        throw Error();
+      }
+
+      profile.experience.splice(experienceIndex, 1);
+      return profile.save();
+    })
+    .then(profile => {
+      res.status(200).json({ profile });
+    })
+    .catch(() => {
+      res.status(404).json({ errors });
+    });
+};
+
 const addEducationToProfile = (req, res) => {
   const { errors, isValid } = educationValidation(req.body);
 
@@ -220,6 +259,8 @@ const addEducationToProfile = (req, res) => {
     });
 };
 
+const removeEducationFromProfile = (req, res) => {};
+
 module.exports = {
   getUserProfile,
   createUserProfile,
@@ -228,5 +269,6 @@ module.exports = {
   getProfileByUserId,
   getAllProfiles,
   addExperienceToProfile,
+  removeExperienceFromProfile,
   addEducationToProfile
 };
