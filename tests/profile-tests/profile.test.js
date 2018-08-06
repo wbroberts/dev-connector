@@ -312,3 +312,49 @@ describe('POST /api/profile/experience', () => {
       .end(done);
   });
 });
+
+describe('POST /api/profile/education', () => {
+  it('should add education to the profile', done => {
+    const education = {
+      school: 'University of Utah',
+      degree: 'BS',
+      fieldOfStudy: 'Computer Science',
+      from: 'Aug 2010',
+      to: 'May 2014'
+    };
+
+    authenticatedUser1
+      .post('/api/profile/education')
+      .set('authorization', token1)
+      .send(education)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.profile.education[0]).toBeDefined();
+        expect(res.body.profile.education[0].title).toBe(education.title);
+      })
+      .end(done);
+  });
+
+  it('should NOT add education to the profile', done => {
+    const education = {
+      school: '',
+      degree: '',
+      fieldOfStudy: '',
+      from: ''
+    };
+
+    authenticatedUser1
+      .post('/api/profile/education')
+      .set('authorization', token1)
+      .send(education)
+      .expect(400)
+      .expect(res => {
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.school).toBeDefined();
+        expect(res.body.errors.degree).toBeDefined();
+        expect(res.body.errors.fieldOfStudy).toBeDefined();
+        expect(res.body.errors.from).toBeDefined();
+      })
+      .end(done);
+  });
+});

@@ -118,9 +118,7 @@ const getProfileByHandle = (req, res) => {
 
       res.status(200).json({ profile });
     })
-    .catch(() => {
-      res.status(404).json({ errors });
-    });
+    .catch(() => res.status(404).json({ errors }));
 };
 
 // Searches for profile by user ID
@@ -143,9 +141,7 @@ const getProfileByUserId = (req, res) => {
 
       res.status(200).json({ profile });
     })
-    .catch(() => {
-      res.status(404).json({ errors });
-    });
+    .catch(() => res.status(404).json({ errors }));
 };
 
 // Returns all profiles
@@ -185,14 +181,11 @@ const addExperienceToProfile = (req, res) => {
       return profile;
     })
     .then(profile => profile.save())
-    .then(profile => {
-      res.status(200).json({ profile });
-    })
-    .catch(() => {
-      res.status(400).json({ errors });
-    });
+    .then(profile => res.status(200).json({ profile }))
+    .catch(() => res.status(400).json({ errors }));
 };
 
+// Removes experience from profile
 const removeExperienceFromProfile = (req, res) => {
   const errors = {};
   const experienceId = req.params.expId;
@@ -212,26 +205,25 @@ const removeExperienceFromProfile = (req, res) => {
       return profile;
     })
     .then(profile => {
+      // Creates an array of the IDs and then looks for the index
+      // of the experience to remove (then uses splice)
       const experienceIndex = profile.experience
         .map(exp => exp.id)
         .indexOf(experienceId);
-
+      // Error if no experience is found
       if (experienceIndex === -1) {
-        errors.experience = 'No experience found';
+        errors.experience = 'No experience found to remove';
         throw Error();
       }
 
       profile.experience.splice(experienceIndex, 1);
       return profile.save();
     })
-    .then(profile => {
-      res.status(200).json({ profile });
-    })
-    .catch(() => {
-      res.status(404).json({ errors });
-    });
+    .then(profile => res.status(200).json({ profile }))
+    .catch(() => res.status(404).json({ errors }));
 };
 
+// Adds education to profile
 const addEducationToProfile = (req, res) => {
   const { errors, isValid } = educationValidation(req.body);
 
@@ -251,15 +243,45 @@ const addEducationToProfile = (req, res) => {
       return profile;
     })
     .then(profile => profile.save())
-    .then(profile => {
-      res.status(200).json({ profile });
-    })
-    .catch(() => {
-      res.status(400).json({ errors });
-    });
+    .then(profile => res.status(200).json({ profile }))
+    .catch(() => res.status(400).json({ errors }));
 };
 
-const removeEducationFromProfile = (req, res) => {};
+// Removes education from profile
+const removeEducationFromProfile = (req, res) => {
+  const errors = {};
+  const educationId = req.params.eduId;
+
+  if (!Object.isValid(educationId)) {
+    errors.education = 'Not a valid Object ID';
+    return res.status(400).json({ errors });
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      if (!profile) {
+        errors.profile = 'No profile found';
+        throw Error();
+      }
+
+      return profile;
+    })
+    .then(profile => {
+      const educationIndex = profile.education
+        .map(edu => edu.id)
+        .indexOf(educationId);
+      // Error if no education is found
+      if (educationIndex === -1) {
+        errors.education = 'No education found to remove';
+        throw Error();
+      }
+
+      profile.education.splice(educationIndex, 1);
+      return profile.save();
+    })
+    .then(profile => res.status(200).json({ profile }))
+    .catch(() => res.status(404).json({ errors }));
+};
 
 module.exports = {
   getUserProfile,
@@ -270,5 +292,6 @@ module.exports = {
   getAllProfiles,
   addExperienceToProfile,
   removeExperienceFromProfile,
-  addEducationToProfile
+  addEducationToProfile,
+  removeEducationFromProfile
 };

@@ -10,7 +10,8 @@ const {
   getAllProfiles,
   addExperienceToProfile,
   addEducationToProfile,
-  removeExperienceFromProfile
+  removeExperienceFromProfile,
+  removeEducationFromProfile
 } = require('./helpers/profile-helpers');
 
 router.get('/test', (req, res) => {
@@ -53,5 +54,6 @@ router.route('/education').post(addEducationToProfile);
 // METHODS  DELETE
 // ACCESS   Private
 router.route('/experience/:expId').delete(removeExperienceFromProfile);
+router.route('/education/:eduId').delete(removeEducationFromProfile);
 
 module.exports = router;
