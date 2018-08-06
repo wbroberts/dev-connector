@@ -252,8 +252,8 @@ const removeEducationFromProfile = (req, res) => {
   const errors = {};
   const educationId = req.params.eduId;
 
-  if (!Object.isValid(educationId)) {
-    errors.education = 'Not a valid Object ID';
+  if (!ObjectID.isValid(educationId)) {
+    errors.educationId = 'Not a valid Object ID';
     return res.status(400).json({ errors });
   }
 

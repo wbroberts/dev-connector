@@ -23,7 +23,7 @@ router.get('/test', (req, res) => {
 // Authentication routes
 // Private
 router.all(
-  ['/', '/experience', '/experience/:expId', '/education'],
+  ['/', '/experience', '/experience/:expId', '/education', '/education/:eduId'],
   passport.authenticate('jwt', { session: false })
 );
 

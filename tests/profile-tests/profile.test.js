@@ -313,6 +313,21 @@ describe('POST /api/profile/experience', () => {
   });
 });
 
+describe('DELETE /api/profile/experience/:expId', () => {
+  it('should remove experience from the profile', done => {
+    const experienceID = profiles[0].experience[0]._id;
+
+    authenticatedUser1
+      .delete(`/api/profile/experience/${experienceID}`)
+      .set('authorization', token1)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.profile.experience.length).toBe(1);
+      })
+      .end(done);
+  });
+});
+
 describe('POST /api/profile/education', () => {
   it('should add education to the profile', done => {
     const education = {
@@ -330,7 +345,7 @@ describe('POST /api/profile/education', () => {
       .expect(200)
       .expect(res => {
         expect(res.body.profile.education[0]).toBeDefined();
-        expect(res.body.profile.education[0].title).toBe(education.title);
+        expect(res.body.profile.education[0].school).toBe(education.school);
       })
       .end(done);
   });
@@ -354,6 +369,21 @@ describe('POST /api/profile/education', () => {
         expect(res.body.errors.degree).toBeDefined();
         expect(res.body.errors.fieldOfStudy).toBeDefined();
         expect(res.body.errors.from).toBeDefined();
+      })
+      .end(done);
+  });
+});
+
+describe('DELETE /api/profile/education/:eduId', () => {
+  it('should remove education from the profile', done => {
+    const educationID = profiles[0].education[0]._id;
+
+    authenticatedUser1
+      .delete(`/api/profile/education/${educationID}`)
+      .set('authorization', token1)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.profile.education.length).toBe(1);
       })
       .end(done);
   });
