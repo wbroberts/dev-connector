@@ -37,23 +37,25 @@ router
   .post(createUserProfile)
   .put(updateUserProfile);
 
+// ROUTE    /api/profile/experience(/:expId)
+// DESC     Adds and removes experience from profile
+// METHODS  POST, DELETE
+// ACCESS   Private
+router.route('/experience').post(addExperienceToProfile);
+router.route('/experience/:expId').delete(removeExperienceFromProfile);
+
+// ROUTE    /api/profile/education(/:eduId)
+// DESC     Adds and removes education from profile
+// METHODS  POST, DELETE
+// ACCESS   Private
+router.route('/education').post(addEducationToProfile);
+router.route('/education/:eduId').delete(removeEducationFromProfile);
+
 // DESC     Ways to find/get a profile(s)
 // METHODS  GET
 // ACCESS   Public
 router.route('/handle/:handle').get(getProfileByHandle); // by handle
 router.route('/user/:id').get(getProfileByUserId); // by user id
 router.route('/all').get(getAllProfiles); // all profiles
-
-// DESC     Adds experience and education to user's profile
-// METHODS  POST
-// ACCESS   Private
-router.route('/experience').post(addExperienceToProfile);
-router.route('/education').post(addEducationToProfile);
-
-// DESC     Removes experience and education from user's profile
-// METHODS  DELETE
-// ACCESS   Private
-router.route('/experience/:expId').delete(removeExperienceFromProfile);
-router.route('/education/:eduId').delete(removeEducationFromProfile);
 
 module.exports = router;

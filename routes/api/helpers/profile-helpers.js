@@ -103,6 +103,7 @@ const updateUserProfile = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// GET '/api/profile/handle/:handle'
 // Searches for the profile by handle
 const getProfileByHandle = (req, res) => {
   const errors = {};
@@ -121,6 +122,7 @@ const getProfileByHandle = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
+// GET '/api/profile/user/:id
 // Searches for profile by user ID
 const getProfileByUserId = (req, res) => {
   const errors = {};
@@ -144,6 +146,7 @@ const getProfileByUserId = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
+// GET '/api/profile/all'
 // Returns all profiles
 const getAllProfiles = (req, res) => {
   const errors = {};
@@ -161,6 +164,7 @@ const getAllProfiles = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
+// POST '/api/profile/experience'
 // Adds experience to profile
 const addExperienceToProfile = (req, res) => {
   const { errors, isValid } = experienceValidation(req.body);
@@ -185,6 +189,7 @@ const addExperienceToProfile = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// DELETE '/api/profile/experience/:expId'
 // Removes experience from profile
 const removeExperienceFromProfile = (req, res) => {
   const errors = {};
@@ -223,6 +228,7 @@ const removeExperienceFromProfile = (req, res) => {
     .catch(() => res.status(404).json({ errors }));
 };
 
+// POST '/api/profile/education'
 // Adds education to profile
 const addEducationToProfile = (req, res) => {
   const { errors, isValid } = educationValidation(req.body);
@@ -247,6 +253,7 @@ const addEducationToProfile = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// DELETE '/api/profile/education/:eduId'
 // Removes education from profile
 const removeEducationFromProfile = (req, res) => {
   const errors = {};

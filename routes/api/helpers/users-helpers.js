@@ -1,8 +1,9 @@
 const gravatar = require('gravatar');
 const jwt = require('jsonwebtoken');
 
-// User model
+// Models
 const User = require('../../../models/User');
+const Profile = require('../../../models/Profile');
 // Validation
 const userRegistrationValidation = require('../../../validation/userRegistrationValidation');
 const loginValidation = require('../../../validation/loginValidation');
@@ -113,8 +114,16 @@ const authenticateUser = (req, res) => {
   });
 };
 
+// DELETE '/api/users'
+const removeUserAccount = (req, res) => {
+  Profile.findOneAndRemove({ user: req.user.id })
+    .then(() => User.findByIdAndRemove(req.user.id))
+    .then(() => res.status(200).json({ success: true }));
+};
+
 module.exports = {
   registerUser,
   login,
-  authenticateUser
+  authenticateUser,
+  removeUserAccount
 };
