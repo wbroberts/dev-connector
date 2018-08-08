@@ -1,6 +1,6 @@
 const { ObjectID } = require('mongodb');
 
-// Load profile models
+// Load profile model
 const Profile = require('../../../models/Profile');
 
 // Load functions
@@ -166,7 +166,7 @@ const getAllProfiles = (req, res) => {
 
 // POST '/api/profile/experience'
 // Adds experience to profile
-const addExperienceToProfile = (req, res) => {
+const addExperience = (req, res) => {
   const { errors, isValid } = experienceValidation(req.body);
 
   if (!isValid) {
@@ -191,7 +191,7 @@ const addExperienceToProfile = (req, res) => {
 
 // DELETE '/api/profile/experience/:expId'
 // Removes experience from profile
-const removeExperienceFromProfile = (req, res) => {
+const removeExperienceById = (req, res) => {
   const errors = {};
   const experienceId = req.params.expId;
 
@@ -230,7 +230,7 @@ const removeExperienceFromProfile = (req, res) => {
 
 // POST '/api/profile/education'
 // Adds education to profile
-const addEducationToProfile = (req, res) => {
+const addEducation = (req, res) => {
   const { errors, isValid } = educationValidation(req.body);
 
   if (!isValid) {
@@ -255,7 +255,7 @@ const addEducationToProfile = (req, res) => {
 
 // DELETE '/api/profile/education/:eduId'
 // Removes education from profile
-const removeEducationFromProfile = (req, res) => {
+const removeEducationById = (req, res) => {
   const errors = {};
   const educationId = req.params.eduId;
 
@@ -297,8 +297,8 @@ module.exports = {
   getProfileByHandle,
   getProfileByUserId,
   getAllProfiles,
-  addExperienceToProfile,
-  removeExperienceFromProfile,
-  addEducationToProfile,
-  removeEducationFromProfile
+  addExperience,
+  removeExperienceById,
+  addEducation,
+  removeEducationById
 };

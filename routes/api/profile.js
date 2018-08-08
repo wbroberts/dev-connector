@@ -8,10 +8,10 @@ const {
   getProfileByHandle,
   getProfileByUserId,
   getAllProfiles,
-  addExperienceToProfile,
-  addEducationToProfile,
-  removeExperienceFromProfile,
-  removeEducationFromProfile
+  addExperience,
+  addEducation,
+  removeExperienceById,
+  removeEducationById
 } = require('./helpers/profile-helpers');
 
 router.get('/test', (req, res) => {
@@ -41,15 +41,15 @@ router
 // DESC     Adds and removes experience from profile
 // METHODS  POST, DELETE
 // ACCESS   Private
-router.route('/experience').post(addExperienceToProfile);
-router.route('/experience/:expId').delete(removeExperienceFromProfile);
+router.route('/experience').post(addExperience);
+router.route('/experience/:expId').delete(removeExperienceById);
 
 // ROUTE    /api/profile/education(/:eduId)
 // DESC     Adds and removes education from profile
 // METHODS  POST, DELETE
 // ACCESS   Private
-router.route('/education').post(addEducationToProfile);
-router.route('/education/:eduId').delete(removeEducationFromProfile);
+router.route('/education').post(addEducation);
+router.route('/education/:eduId').delete(removeEducationById);
 
 // DESC     Ways to find/get a profile(s)
 // METHODS  GET
