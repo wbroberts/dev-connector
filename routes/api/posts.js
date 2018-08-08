@@ -5,7 +5,8 @@ const {
   addNewPost,
   getAllPosts,
   getOnePostById,
-  removePostById
+  removePostById,
+  likeAndUnlikePost
 } = require('./helpers/posts-helpers');
 
 router.route('/test').get((req, res) => {
@@ -29,5 +30,9 @@ router
   .route('/:id')
   .get(getOnePostById)
   .delete(passport.authenticate('jwt', { session: false }), removePostById);
+
+router
+  .route('/like/:id')
+  .post(passport.authenticate('jwt', { session: false }), likeAndUnlikePost);
 
 module.exports = router;

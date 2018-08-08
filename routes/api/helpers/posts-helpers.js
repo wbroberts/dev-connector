@@ -83,9 +83,9 @@ const removePostById = (req, res) => {
   }
 
   // Make sure it is an authorized user
-  Profile.findOne({ user: req.user.id })
-    .then(profile => {
-      Post.findById(postID).then(post => {
+  Profile.findOne({ user: req.user.id }).then(profile => {
+    Post.findById(postID)
+      .then(post => {
         // Check to see if it is a post created by the user
         // return an error
         if (post.user.toString() !== req.user.id) {
@@ -94,14 +94,52 @@ const removePostById = (req, res) => {
         }
 
         post.remove().then(() => res.status(200).json({ success: true }));
+      })
+      .catch(() => {
+        errors.post = 'No post found';
+        res.status(404).json({ errors });
       });
+  });
+};
+
+const likeAndUnlikePost = (req, res) => {
+  const errors = {};
+  const postID = req.params.id;
+
+  if (!ObjectID.isValid(postID)) {
+    errors.id = 'Not a valid ID';
+    return res.status(400).json({ errors });
+  }
+
+  Post.findById(postID)
+    .then(post => {
+      if (!post) {
+        errors.post = 'No post found';
+        throw Error();
+      }
+
+      // Returns the index of the like if it has already been liked.
+      // Allows it to be removed from the array (unlike the post).
+      const alreadyLiked = post.likes
+        .map(like => like.user.toString())
+        .indexOf(req.user.id);
+
+      if (alreadyLiked !== -1) {
+        post.likes.splice(alreadyLiked, 1);
+      } else {
+        post.likes.push({ user: req.user.id });
+      }
+
+      return post.save();
     })
-    .catch(() => res.status(404).json({ post: 'not found' }));
+    .then(post => res.status(200).json({ post }))
+    .catch(() => res.status(404).json({ errors }));
 };
 
 module.exports = {
   addNewPost,
   getAllPosts,
   getOnePostById,
-  removePostById
+  removePostById,
+  likeAndUnlikePost
 };
