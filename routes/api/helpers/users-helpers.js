@@ -24,7 +24,7 @@ const registerUser = (req, res) => {
       // Check if email is already in the database
       if (user) {
         errors.email = 'Email already in use';
-        throw Error(errors);
+        throw Error();
       }
     })
     .then(() => {
@@ -54,8 +54,7 @@ const registerUser = (req, res) => {
 
       res.status(201).json(userData);
     })
-    .catch(error => {
-      errors.error = error;
+    .catch(() => {
       res.status(400).json({ errors });
     });
 };

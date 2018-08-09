@@ -169,7 +169,6 @@ const unlikePost = (req, res) => {
 const addComment = (req, res) => {
   const { errors, isValid } = commentValidation(req.body);
   const postID = req.params.postId;
-  const user = req.params.id;
 
   if (!ObjectID.isValid(postID)) {
     errors.id = 'Not a valid ID';
@@ -182,7 +181,7 @@ const addComment = (req, res) => {
 
   const newComment = new Comment({
     post: postID,
-    user,
+    user: req.user.id,
     body: req.body.body,
     name: req.user.name,
     avatar: req.user.avatar
@@ -213,7 +212,16 @@ const removeComment = (req, res) => {
     return res.status(400).json({ errors });
   }
 
-  Comment.findByIdAndRemove(commentID)
+  Comment.findById(commentID)
+    .then(comment => {
+      // Make sure that the authenticated user is the owner of the comment
+      if (comment.user.toString() !== req.user.id) {
+        errors.authorization = 'You are not authorized to delete that comment';
+        throw Error();
+      }
+
+      return comment.remove();
+    })
     .then(() => {
       return Post.findByIdAndUpdate(
         postID,
