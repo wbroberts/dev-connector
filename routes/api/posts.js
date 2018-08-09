@@ -7,7 +7,9 @@ const {
   getOnePostById,
   removePostById,
   likePost,
-  unlikePost
+  unlikePost,
+  addComment,
+  removeComment
 } = require('./helpers/posts-helpers');
 
 router.route('/test').get((req, res) => {
@@ -32,9 +34,29 @@ router
   .get(getOnePostById)
   .delete(passport.authenticate('jwt', { session: false }), removePostById);
 
+// ROUTE    /api/posts/like/:postId
+// DESC     Likes and unlikes posts
+// METHODS  POST, DELETE
+// ACCESS   Private
 router
-  .route('/like/:id')
+  .route('/like/:postId')
   .post(passport.authenticate('jwt', { session: false }), likePost)
   .delete(passport.authenticate('jwt', { session: false }), unlikePost);
+
+// ROUTE    /api/posts/comment/:postId
+// DESC     Adds a comment to a post
+// METHODS  POST
+// ACCESS   Private
+router
+  .route('/comment/:postId')
+  .post(passport.authenticate('jwt', { session: false }), addComment);
+
+// ROUTE    /api/posts/comment/:postId/:commentId
+// DESC     Removes a comment from a post
+// METHODS  DELETE
+// ACCESS   Private
+router
+  .route('/comment/:postId/:commentId')
+  .delete(passport.authenticate('jwt', { session: false }), removeComment);
 
 module.exports = router;

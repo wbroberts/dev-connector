@@ -7,6 +7,7 @@ const Like = require('../../../models/Like');
 const Comment = require('../../../models/Comment');
 // Load functions
 const postValidation = require('../../../validation/postValidation');
+const commentValidation = require('../../../validation/commentValidation');
 
 const addNewPost = (req, res) => {
   const { errors, isValid } = postValidation(req.body);
@@ -107,7 +108,7 @@ const removePostById = (req, res) => {
 
 const likePost = (req, res) => {
   const errors = {};
-  const postID = req.params.id;
+  const postID = req.params.postId;
   const user = req.user.id;
 
   if (!ObjectID.isValid(postID)) {
@@ -139,9 +140,11 @@ const likePost = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// Removes like from Like db and then updates
+// the Post likes array
 const unlikePost = (req, res) => {
   const errors = {};
-  const postID = req.params.id;
+  const postID = req.params.postId;
   const user = req.user.id;
 
   if (!ObjectID.isValid(postID)) {
@@ -149,10 +152,8 @@ const unlikePost = (req, res) => {
     return res.status(400).json({ errors });
   }
 
-  Like.findOne({ post: postID, user })
+  Like.findOneAndRemove({ post: postID, user })
     .then(like => {
-      like.remove();
-
       return Post.findByIdAndUpdate(
         postID,
         { $pull: { likes: { like: like._id } } },
@@ -163,18 +164,65 @@ const unlikePost = (req, res) => {
     .catch(() => res.status(400).json({ errors }));
 };
 
+// Creates a comment and saves it to Comment db
+// and then adds it to the Post comments array.
 const addComment = (req, res) => {
-  const errors = {};
-  const postID = req.params.id;
+  const { errors, isValid } = commentValidation(req.body);
+  const postID = req.params.postId;
+  const user = req.params.id;
 
   if (!ObjectID.isValid(postID)) {
     errors.id = 'Not a valid ID';
     return res.status(400).json({ errors });
   }
 
-  Post.findById(postID)
-    .then(post => {})
-    .catch(() => res.status(404).json({ errors }));
+  if (!isValid) {
+    return res.status(400).json({ errors });
+  }
+
+  const newComment = new Comment({
+    post: postID,
+    user,
+    body: req.body.body,
+    name: req.user.name,
+    avatar: req.user.avatar
+  });
+
+  newComment
+    .save()
+    .then(comment => {
+      return Post.findByIdAndUpdate(
+        postID,
+        { $push: { comments: { comment } } },
+        { new: true }
+      ).populate('comments.comment');
+    })
+    .then(post => res.status(201).json({ post }))
+    .catch(() => res.status(400).json({ errors }));
+};
+
+// Removes comment from Comment db and then
+// removes it from the Post comments array.
+const removeComment = (req, res) => {
+  const errors = {};
+  const postID = req.params.postId;
+  const commentID = req.params.commentId;
+
+  if (!ObjectID.isValid(postID) || !ObjectID.isValid(commentID)) {
+    errors.id = 'Not a valid ID';
+    return res.status(400).json({ errors });
+  }
+
+  Comment.findByIdAndRemove(commentID)
+    .then(() => {
+      return Post.findByIdAndUpdate(
+        postID,
+        { $pull: { comments: { comment: commentID } } },
+        { new: true }
+      ).populate('comments.comment');
+    })
+    .then(post => res.status(200).json({ post }))
+    .catch(() => res.status(400).json({ errors }));
 };
 
 module.exports = {
@@ -183,5 +231,7 @@ module.exports = {
   getOnePostById,
   removePostById,
   likePost,
-  unlikePost
+  unlikePost,
+  addComment,
+  removeComment
 };

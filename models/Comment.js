@@ -15,6 +15,16 @@ const commentSchema = mongoose.Schema({
   },
   body: {
     type: String,
+    required: true,
+    minlength: 1,
+    maxlength: 300
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  avatar: {
+    type: String,
     required: true
   }
 });
