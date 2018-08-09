@@ -3,6 +3,7 @@ const { ObjectID } = require('mongodb');
 // Load Models
 const Post = require('../../../models/Post');
 const Profile = require('../../../models/Profile');
+const Like = require('../../../models/Like');
 // Load functions
 const postValidation = require('../../../validation/postValidation');
 
@@ -60,6 +61,7 @@ const getOnePostById = (req, res) => {
   }
 
   Post.findById(postID)
+    .populate('likes.like')
     .then(post => {
       if (!post) {
         errors.post = 'No post found';
@@ -102,7 +104,57 @@ const removePostById = (req, res) => {
   });
 };
 
-const likeAndUnlikePost = (req, res) => {
+const likePost = (req, res) => {
+  const errors = {};
+  const postID = req.params.id;
+  const user = req.user.id;
+
+  if (!ObjectID.isValid(postID)) {
+    errors.id = 'Not a valid ID';
+    return res.status(400).json({ errors });
+  }
+
+  Like.findOne({ post: postID, user })
+    .then(like => {
+      if (like) {
+        errors.like = 'User already liked this post';
+        throw Error();
+      }
+
+      const newLike = new Like({ post: postID, user });
+      return newLike.save();
+    })
+    .then(like => {
+      return Post.findByIdAndUpdate(
+        postID,
+        { $push: { likes: { like } } },
+        { new: true }
+      );
+    })
+    .then(post => res.status(200).json({ post }))
+    .catch(() => res.status(400).json({ errors }));
+};
+
+const unlikePost = (req, res) => {
+  const errors = {};
+  const postID = req.params.id;
+  const user = req.user.id;
+
+  if (!ObjectID.isValid(postID)) {
+    errors.id = 'Not a valid ID';
+    return res.status(400).json({ errors });
+  }
+
+  Like.findOneAndRemove({ post: postID, user })
+    .then(() => Post.findById(postID))
+    .then(post => {
+      return post.save();
+    })
+    .then(post => res.status(200).json({ post }))
+    .catch(() => res.status(400).json({ errors }));
+};
+
+const addComment = (req, res) => {
   const errors = {};
   const postID = req.params.id;
 
@@ -112,27 +164,7 @@ const likeAndUnlikePost = (req, res) => {
   }
 
   Post.findById(postID)
-    .then(post => {
-      if (!post) {
-        errors.post = 'No post found';
-        throw Error();
-      }
-
-      // Returns the index of the like if it has already been liked.
-      // Allows it to be removed from the array (unlike the post).
-      const alreadyLiked = post.likes
-        .map(like => like.user.toString())
-        .indexOf(req.user.id);
-
-      if (alreadyLiked !== -1) {
-        post.likes.splice(alreadyLiked, 1);
-      } else {
-        post.likes.push({ user: req.user.id });
-      }
-
-      return post.save();
-    })
-    .then(post => res.status(200).json({ post }))
+    .then(post => {})
     .catch(() => res.status(404).json({ errors }));
 };
 
@@ -141,5 +173,6 @@ module.exports = {
   getAllPosts,
   getOnePostById,
   removePostById,
-  likeAndUnlikePost
+  likePost,
+  unlikePost
 };
