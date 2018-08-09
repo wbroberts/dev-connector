@@ -29,25 +29,9 @@ const postSchema = mongoose.Schema({
   ],
   comments: [
     {
-      user: {
+      comment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      },
-      text: {
-        type: String,
-        required: true
-      },
-      name: {
-        type: String,
-        required: true
-      },
-      avatar: {
-        type: String,
-        required: true
-      },
-      date: {
-        type: Date,
-        default: Date.now
+        ref: 'Comment'
       }
     }
   ]
