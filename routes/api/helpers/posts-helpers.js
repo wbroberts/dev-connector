@@ -4,6 +4,7 @@ const { ObjectID } = require('mongodb');
 const Post = require('../../../models/Post');
 const Profile = require('../../../models/Profile');
 const Like = require('../../../models/Like');
+const Comment = require('../../../models/Comment');
 // Load functions
 const postValidation = require('../../../validation/postValidation');
 
@@ -114,6 +115,9 @@ const likePost = (req, res) => {
     return res.status(400).json({ errors });
   }
 
+  // First search to see if the post is already liked by the user
+  // which would be stored in the likes. If it is, then error, else
+  // it creates the like and adds it to the post.
   Like.findOne({ post: postID, user })
     .then(like => {
       if (like) {
@@ -145,10 +149,15 @@ const unlikePost = (req, res) => {
     return res.status(400).json({ errors });
   }
 
-  Like.findOneAndRemove({ post: postID, user })
-    .then(() => Post.findById(postID))
-    .then(post => {
-      return post.save();
+  Like.findOne({ post: postID, user })
+    .then(like => {
+      like.remove();
+
+      return Post.findByIdAndUpdate(
+        postID,
+        { $pull: { likes: { like: like._id } } },
+        { new: true }
+      );
     })
     .then(post => res.status(200).json({ post }))
     .catch(() => res.status(400).json({ errors }));

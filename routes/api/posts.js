@@ -6,7 +6,8 @@ const {
   getAllPosts,
   getOnePostById,
   removePostById,
-  likePost
+  likePost,
+  unlikePost
 } = require('./helpers/posts-helpers');
 
 router.route('/test').get((req, res) => {
@@ -33,6 +34,7 @@ router
 
 router
   .route('/like/:id')
-  .post(passport.authenticate('jwt', { session: false }), likePost);
+  .post(passport.authenticate('jwt', { session: false }), likePost)
+  .delete(passport.authenticate('jwt', { session: false }), unlikePost);
 
 module.exports = router;
