@@ -3,11 +3,10 @@ const { ObjectID } = require('mongodb');
 // Load Models
 const Post = require('../../../models/Post');
 const Profile = require('../../../models/Profile');
-const Like = require('../../../models/Like');
+
 const Comment = require('../../../models/Comment');
 // Load functions
 const postValidation = require('../../../validation/postValidation');
-const commentValidation = require('../../../validation/commentValidation');
 
 const addNewPost = (req, res) => {
   const { errors, isValid } = postValidation(req.body);
@@ -106,140 +105,9 @@ const removePostById = (req, res) => {
   });
 };
 
-const likePost = (req, res) => {
-  const errors = {};
-  const postID = req.params.postId;
-  const user = req.user.id;
-
-  if (!ObjectID.isValid(postID)) {
-    errors.id = 'Not a valid ID';
-    return res.status(400).json({ errors });
-  }
-
-  // First search to see if the post is already liked by the user
-  // which would be stored in the likes. If it is, then error, else
-  // it creates the like and adds it to the post.
-  Like.findOne({ post: postID, user })
-    .then(like => {
-      if (like) {
-        errors.like = 'User already liked this post';
-        throw Error();
-      }
-
-      const newLike = new Like({ post: postID, user });
-      return newLike.save();
-    })
-    .then(like => {
-      return Post.findByIdAndUpdate(
-        postID,
-        { $push: { likes: { like } } },
-        { new: true }
-      );
-    })
-    .then(post => res.status(200).json({ post }))
-    .catch(() => res.status(400).json({ errors }));
-};
-
-// Removes like from Like db and then updates
-// the Post likes array
-const unlikePost = (req, res) => {
-  const errors = {};
-  const postID = req.params.postId;
-  const user = req.user.id;
-
-  if (!ObjectID.isValid(postID)) {
-    errors.id = 'Not a valid ID';
-    return res.status(400).json({ errors });
-  }
-
-  Like.findOneAndRemove({ post: postID, user })
-    .then(like => {
-      return Post.findByIdAndUpdate(
-        postID,
-        { $pull: { likes: { like: like._id } } },
-        { new: true }
-      );
-    })
-    .then(post => res.status(200).json({ post }))
-    .catch(() => res.status(400).json({ errors }));
-};
-
-// Creates a comment and saves it to Comment db
-// and then adds it to the Post comments array.
-const addComment = (req, res) => {
-  const { errors, isValid } = commentValidation(req.body);
-  const postID = req.params.postId;
-
-  if (!ObjectID.isValid(postID)) {
-    errors.id = 'Not a valid ID';
-    return res.status(400).json({ errors });
-  }
-
-  if (!isValid) {
-    return res.status(400).json({ errors });
-  }
-
-  const newComment = new Comment({
-    post: postID,
-    user: req.user.id,
-    body: req.body.body,
-    name: req.user.name,
-    avatar: req.user.avatar
-  });
-
-  newComment
-    .save()
-    .then(comment => {
-      return Post.findByIdAndUpdate(
-        postID,
-        { $push: { comments: { comment } } },
-        { new: true }
-      ).populate('comments.comment');
-    })
-    .then(post => res.status(201).json({ post }))
-    .catch(() => res.status(400).json({ errors }));
-};
-
-// Removes comment from Comment db and then
-// removes it from the Post comments array.
-const removeComment = (req, res) => {
-  const errors = {};
-  const postID = req.params.postId;
-  const commentID = req.params.commentId;
-
-  if (!ObjectID.isValid(postID) || !ObjectID.isValid(commentID)) {
-    errors.id = 'Not a valid ID';
-    return res.status(400).json({ errors });
-  }
-
-  Comment.findById(commentID)
-    .then(comment => {
-      // Make sure that the authenticated user is the owner of the comment
-      if (comment.user.toString() !== req.user.id) {
-        errors.authorization = 'You are not authorized to delete that comment';
-        throw Error();
-      }
-
-      return comment.remove();
-    })
-    .then(() => {
-      return Post.findByIdAndUpdate(
-        postID,
-        { $pull: { comments: { comment: commentID } } },
-        { new: true }
-      ).populate('comments.comment');
-    })
-    .then(post => res.status(200).json({ post }))
-    .catch(() => res.status(400).json({ errors }));
-};
-
 module.exports = {
   addNewPost,
   getAllPosts,
   getOnePostById,
-  removePostById,
-  likePost,
-  unlikePost,
-  addComment,
-  removeComment
+  removePostById
 };

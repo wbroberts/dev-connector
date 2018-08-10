@@ -5,12 +5,10 @@ const {
   addNewPost,
   getAllPosts,
   getOnePostById,
-  removePostById,
-  likePost,
-  unlikePost,
-  addComment,
-  removeComment
+  removePostById
 } = require('./helpers/posts-helpers');
+const { likePost, unlikePost } = require('./helpers/like-helpers');
+const { addComment, removeComment } = require('./helpers/comment-helpers');
 
 router.route('/test').get((req, res) => {
   res.json({ message: 'this is from the post route' });
