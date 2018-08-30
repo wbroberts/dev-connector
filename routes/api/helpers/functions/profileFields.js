@@ -24,7 +24,7 @@ const profileFields = (reqUser, reqBody) => {
 
   // These are the optional fields for a profile
   if (company) profile.company = company;
-  if (website) profile.website = webiste;
+  if (website) profile.website = website;
   if (location) profile.location = location;
   if (bio) profile.bio = bio;
   if (githubusername) profile.githubusername = githubusername;
